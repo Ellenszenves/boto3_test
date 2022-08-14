@@ -1,10 +1,8 @@
 import boto3
 
-#AWS_SHARED_CREDENTIALS_FILE = 'C:/Users/fallo/.aws/credentials'
-#AWS_CONFIG_FILE = 'C:/Users/fallo/.aws/config'
+ec2 = boto3.resource('ec2')
 
 def list_ec2():
-    ec2 = boto3.resource('ec2')
     counter = 0
     instances = ec2.instances.filter(
     Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
@@ -15,8 +13,17 @@ def list_ec2():
     main()
 
 def create_ec2():
-    ec2 = boto3.resource('ec2')
-    ec2.create_instances(ImageId='ami-051dfed8f67f095f5', MinCount=1, MaxCount=1, InstanceType='t2.micro', KeyName='ellenszenves')
+    your_key = input('Your key name: ')
+    create_instance = ec2.create_instances(ImageId='ami-051dfed8f67f095f5', MinCount=1, MaxCount=1, InstanceType='t2.micro', KeyName=your_key)
+    print(create_instance)
+    main()
+
+def del_ec2():
+    your_ec2 = input('Instance ID: ')
+    ec2_list = [your_ec2]
+    #print(your_ec2)
+    ec2.instances.filter(InstanceIds = ec2_list).terminate()
+    print(f'{your_ec2} terminated!')
     main()
 
 def create_s3():
@@ -62,9 +69,11 @@ def main():
     Select a number from the menu:
     1. Create EC2 instance
     2. List EC2 instances
-    3. S3 bucket
-    4. List buckets
-    5. Delete buckets
+    3. Delete EC2 instance
+    4. Create S3 bucket
+    5. List buckets
+    6. Delete buckets
+    9. Exit
     """
     print(stringem)
     imp = input(f'Choose:  ')
@@ -73,11 +82,16 @@ def main():
     elif imp == '2':
         list_ec2()
     elif imp == '3':
-        create_s3()
+        del_ec2()
     elif imp == '4':
-        list_s3()
+        create_s3()
     elif imp == '5':
+        list_s3()
+    elif imp == '6':
         del_s3()
+    elif imp == '9':
+        print('Bye!')
+        exit
     else:
         print(f'Invalid option!')
         main()
